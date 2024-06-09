@@ -2,11 +2,10 @@
 
 #include <functional>
 
-#include "console_widget.h"
+#include "../../console_widget.h"
+#include "../../utils/const.h"
 
 class ConVarBase;
-
-using ConVarCallback = std::function < bool ( ConVarBase*, const QStringList&, ConsoleWidget* ) >;
 
 enum class eCVarType
 {
@@ -27,7 +26,7 @@ public:
 	[[nodiscard]] bool IsVariable() const { return isVariable; }
 	[[nodiscard]] QStringList GetArguments() const { return arguments; }
 #if defined( QT_6 )
-	[[nodiscard]] int GetArgumentCount() const { return static_cast <int>(arguments.size()); }
+	[[nodiscard]] int GetArgumentCount() const { return static_cast < int >( arguments.size() ); }
 #elif defined( QT_5 )
 	[[nodiscard]] int GetArgumentCount() const { return arguments.size(); }
 #endif
@@ -54,17 +53,56 @@ class ConVar final : public ConVarBase
 public:
 	static_assert( std::is_same_v < T, QString > || std::is_same_v < T, int > || std::is_same_v < T, float > || std::is_same_v < T, bool >, "ConVar can only be instantiated with QString, int, float, or bool" );
 
-	ConVar( const QString& name, T value );
+	ConVar( const QString& cvarName, T value ) : ConVarBase( cvarName ), value( value ), defaultValue( value ) {}
 
 	[[nodiscard]] bool HasMinValue() const { return hasMinValue; }
 	[[nodiscard]] T GetMinValue() const { return minValue; }
 	[[nodiscard]] bool HasMaxValue() const { return hasMaxValue; }
 	[[nodiscard]] T GetMaxValue() const { return maxValue; }
 
-	void SetValue( const T& newValue, const ConsoleWidget* console = nullptr );
+	void SetValue( const T& newValue, ConsoleWidget* console )
+	{
+		if ( newValue == value )
+			return;
 
-	void SetMinValue( T minVal );
-	void SetMaxValue( T maxVal );
+		if ( console )
+		{
+			if ( HasMinValue() && newValue < GetMinValue() || HasMaxValue() && newValue > GetMaxValue() )
+			{
+				console->Print( ePrintType::ERROR ) << U8( "ConVar::SetValue() Error: Value is out of range, expected between %1 - %2" ).arg( QString::number( GetMinValue() ) ).arg( QString::number( GetMaxValue() ) );
+				return;
+			}
+
+			if ( this->IsVariable() && console )
+			{
+				const auto message = ConVarChangeMessage.arg( this->GetName() );
+				if ( std::is_same_v < T, QString > ) { console->Print( ePrintType::NOTICE ) << QString( message ).arg( this->GetValue() ).arg( newValue ); }
+				else if ( std::is_same_v < T, int > || std::is_same_v < T, float > ) { console->Print( ePrintType::NOTICE ) << QString( message ).arg( QString::number( this->GetValue() ) ).arg( QString::number( newValue ) ); }
+				else if ( std::is_same_v < T, bool > )
+				{
+					const QString boolValue = this->GetValue() == true ? "true" : "false";
+					const QString newBoolValue = newValue == true ? "true" : "false";
+
+					console->Print( ePrintType::NOTICE ) << QString( message ).arg( boolValue ).arg( newBoolValue );
+				}
+			}
+		}
+
+		value = newValue;
+		//ConsoleWidget::UpdateCommands();
+	}
+
+	void SetMinValue( const T minVal )
+	{
+		minValue = minVal;
+		hasMinValue = true;
+	}
+
+	void SetMaxValue( const T maxVal )
+	{
+		maxValue = maxVal;
+		hasMaxValue = true;
+	}
 
 	[[nodiscard]] T GetValue() const { return value; }
 	[[nodiscard]] T GetDefaultValue() const { return defaultValue; }
@@ -106,6 +144,7 @@ public:
 	static const auto& GetConVars() { return conVars; }
 
 	[[nodiscard]] static ConVarBase* GetConVar( const QString& name );
+
 	template < typename T >
 	[[nodiscard]] static ConVar < T >* GetConVar( const QString& name )
 	{
@@ -116,9 +155,9 @@ public:
 	}
 
 	template < typename T >
-	static void SetConVarValue( const QString& name, T newValue, const ConsoleWidget* console = nullptr )
+	static void SetConVarValue( const QString& name, T newValue, ConsoleWidget* console = nullptr )
 	{
-		if ( auto var = GetConVar < T >( name ); var )
+		if ( ConVar < T >* var = GetConVar < T >( name ); var )
 			var->SetValue( newValue, console );
 	}
 

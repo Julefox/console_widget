@@ -6,6 +6,7 @@
 ConsoleCompleter::ConsoleCompleter( QObject* parent ) : QCompleter( parent )
 {
 	setFilterMode( Qt::MatchContains );
+	setCompletionRole( Qt::UserRole );
 	setCaseSensitivity( Qt::CaseInsensitive );
 }
 
@@ -21,7 +22,7 @@ bool ConsoleCompleter::eventFilter( QObject* obj, QEvent* event )
 {
 	if ( event->type() == QEvent::KeyPress )
 	{
-		if ( const auto keyEvent = dynamic_cast < QKeyEvent* >( event ); keyEvent->key() == Qt::Key_Tab )
+		if ( const auto keyEvent = dynamic_cast < QKeyEvent* >( event ); keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Return )
 		{
 			if ( popup()->isVisible() )
 			{

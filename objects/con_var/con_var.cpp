@@ -1,62 +1,6 @@
 #include "con_var.h"
 
-#include <QObject>
-
 ConVarBase::ConVarBase( const QString& name ) { this->name = name; }
-
-template < typename T >
-ConVar < T >::ConVar( const QString& name, T value ) : ConVarBase( name )
-{
-	this->defaultValue = value;
-	this->value = value;
-}
-
-template < typename T >
-void ConVar < T >::SetValue( const T& newValue, const ConsoleWidget* console )
-{
-	if ( newValue == value )
-		return;
-
-	if ( console )
-	{
-		if ( HasMinValue() && newValue < GetMinValue() || HasMaxValue() && newValue > GetMaxValue() )
-		{
-			console->Print( ePrintType::ERROR, U8( "ConVar::SetValue() Error: Value is out of range, expected between %1 - %2" ).arg( QString::number( GetMinValue() ) ).arg( QString::number( GetMaxValue() ) ) );
-			return;
-		}
-
-		if ( this->IsVariable() && console )
-		{
-			const auto message = ConVarChangeMessage.arg( this->GetName() );
-			if ( std::is_same_v < T, QString > ) { console->Print( ePrintType::NOTICE, QString( message ).arg( this->GetValue() ).arg( newValue ) ); }
-			else if ( std::is_same_v < T, int > || std::is_same_v < T, float > ) { console->Print( ePrintType::NOTICE, QString( message ).arg( QString::number( this->GetValue() ) ).arg( QString::number( newValue ) ) ); }
-			else if ( std::is_same_v < T, bool > )
-			{
-				const QString boolValue = this->GetValue() == true ? "true" : "false";
-				const QString newBoolValue = newValue == true ? "true" : "false";
-
-				console->Print( ePrintType::NOTICE, QString( message ).arg( boolValue ).arg( newBoolValue ) );
-			}
-		}
-	}
-
-	value = newValue;
-	//ConsoleWidget::UpdateCommands();
-}
-
-template < typename T >
-void ConVar < T >::SetMinValue( const T minVal )
-{
-	minValue = minVal;
-	hasMinValue = true;
-}
-
-template < typename T >
-void ConVar < T >::SetMaxValue( const T maxVal )
-{
-	maxValue = maxVal;
-	hasMaxValue = true;
-}
 
 template < typename T >
 eCVarType ConVar < T >::GetType( const ConVarBase* var )
@@ -75,9 +19,10 @@ eCVarType ConVar < T >::GetType( const ConVarBase* var )
 	return eCVarType::STRING;
 }
 
+
 void ConVarManager::ConVarInit()
 {
-	RegisterBoolConVar( "clear", false, "Clear ths console", &ConVarManager::ClearConsoleCallback );
+	RegisterBoolConVar( "clear", false, "Clear the console", &ConVarManager::ClearConsoleCallback );
 	RegisterAlias( "cls", "clear" );
 
 	RegisterBoolConVar( "help", false, "Gives all available commands", &ConVarManager::HelpCallback );

@@ -6,16 +6,18 @@
 #include <QDateTime>
 #include <QTextCharFormat>
 #include <QAbstractItemView>
+#include <QStandardItem>
+#include <QStringListModel>
 
 #include "objects/con_var/con_var.h"
 
-ConsoleWidget::ConsoleWidget( QWidget* parent ) : QWidget( parent ), ui( new Ui::ConsoleWidgetClass() ), completer( new ConsoleCompleter( this ) )
+ConsoleWidget::ConsoleWidget( QWidget* parent ) : QWidget( parent ), ui( new Ui::ConsoleWidgetClass() ), completer( new ConsoleCompleter( this ) ), completerModel( new QStandardItemModel( this ) )
 {
 	ui->setupUi( this );
 
 	QFont font = ui->consoleTextEdit->font();
 	font.setPointSize( 10 );
-	font.setFamily( "Consolas" );
+	font.setFamily( "Cascadia Mono" );
 
 	QFont completerFont = font;
 	completerFont.setBold( true );
@@ -29,8 +31,9 @@ ConsoleWidget::ConsoleWidget( QWidget* parent ) : QWidget( parent ), ui( new Ui:
 	connect( completer, &ConsoleCompleter::TabPressed, this, &ConsoleWidget::TabPressed );
 
 	ui->commandLineEdit->setCompleter( completer );
+	completer->setModel( completerModel );
 
-	//UpdateCommands();
+	UpdateCommands();
 }
 
 void ConsoleWidget::AddLine( const QString& line, const ePrintType type )
@@ -90,12 +93,72 @@ void ConsoleWidget::SetupFonts( const QFont& consoleFont, const QFont& commandFo
 	SetupCompleterFont( completerFont );
 }
 
+void ConsoleWidget::UpdateCommands() const
+{
+	QStringList suggestions, commands;
+
+	for ( const auto& [ name, var ] : ConVarManager::GetConVars() )
+	{
+		QString suggestion = name;
+		QString command = name;
+
+		if ( var->IsVariable() )
+		{
+			if ( const auto conVarFloat = ConVarManager::GetConVar < float >( name ) )
+				suggestion.append( QString( " = [%1]" ).arg( QString::number( conVarFloat->GetValue() ) ) );
+			else if ( const auto conVarInt = ConVarManager::GetConVar < int >( name ) )
+				suggestion.append( QString( " = [%1]" ).arg( QString::number( conVarInt->GetValue() ) ) );
+			else if ( const auto conVarBool = ConVarManager::GetConVar < bool >( name ) )
+			{
+				const QString boolValue = conVarBool->GetValue() == 1 ? "true" : "false";
+
+				suggestion.append( QString( " = [%1]" ).arg( boolValue ) );
+			}
+			else if ( const auto conVarString = ConVarManager::GetConVar < QString >( name ) )
+				suggestion.append( QString( " = [%1]" ).arg( conVarString->GetValue() ) );
+			else { suggestion.append( " = <unknown type>" ); }
+
+			command.append( " " );
+		}
+
+		if ( const QString help = var->GetDescription(); !help.isEmpty() )
+			suggestion.append( " - " + help );
+
+		suggestions.push_back( suggestion );
+		commands.push_back( command );
+	}
+
+#if defined( QT_5 )
+	const int size = commands.size();
+#elif defined( QT_6 )
+	const int size = static_cast < int >( commands.size() );
+#endif
+
+	completerModel->clear();
+
+	for ( int i = 0; i < size; ++i )
+	{
+		const auto standardItem = new QStandardItem( suggestions[ i ] );
+		standardItem->setData( commands[ i ], Qt::UserRole );
+		completerModel->setItem( i, 0, standardItem );
+	}
+}
+
 void ConsoleWidget::SetupConsolesFonts( const QFont& font, const QFont& commandFont, const QFont& completerFont )
 {
 	for ( const ConsoleWidget* console : consoles )
 	{
 		if ( console )
 			console->SetupFonts( font, commandFont, completerFont );
+	}
+}
+
+void ConsoleWidget::UpdateConsolesCommands()
+{
+	for ( const ConsoleWidget* console : consoles )
+	{
+		if ( console )
+			console->UpdateCommands();
 	}
 }
 
@@ -129,16 +192,6 @@ void ConsoleWidget::keyPressEvent( QKeyEvent* event )
 		}
 	}
 	else { QWidget::keyPressEvent( event ); }
-}
-
-void ConsoleWidget::RemoveFirstLine() const
-{
-	QTextCursor cursor( ui->consoleTextEdit->document() );
-
-	cursor.movePosition( QTextCursor::Start );
-	cursor.select( QTextCursor::LineUnderCursor );
-	cursor.removeSelectedText();
-	cursor.deleteChar();
 }
 
 void ConsoleWidget::OnCommandEntered()
@@ -193,7 +246,7 @@ void ConsoleWidget::SaveLogs()
 	{
 		QTextStream out( &file );
 #if defined( QT_6 )
-		out.setEncoding(QStringConverter::Utf8);
+		out.setEncoding( QStringConverter::Utf8 );
 #elif defined( QT_5 )
 		out.setCodec( "UTF-8" );
 #endif
@@ -205,4 +258,14 @@ void ConsoleWidget::TabPressed() const
 {
 	completer->popup()->hide();
 	ui->commandLineEdit->setFocus();
+}
+
+void ConsoleWidget::RemoveFirstLine() const
+{
+	QTextCursor cursor( ui->consoleTextEdit->document() );
+
+	cursor.movePosition( QTextCursor::Start );
+	cursor.select( QTextCursor::LineUnderCursor );
+	cursor.removeSelectedText();
+	cursor.deleteChar();
 }

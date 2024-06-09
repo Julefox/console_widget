@@ -4,7 +4,7 @@
 ConsolePrinter::~ConsolePrinter()
 {
 	if ( console )
-		console->Print( type ) << QString::fromStdString( stream.str() );
+		console->AddLine( QString::fromStdString( stream.str() ), type );
 }
 
 GlobalConsolePrinter::~GlobalConsolePrinter()
@@ -12,6 +12,6 @@ GlobalConsolePrinter::~GlobalConsolePrinter()
 	for ( ConsoleWidget* console : ConsoleWidget::GetConsoles() )
 	{
 		if ( console )
-			console->Print( type ) << QString::fromStdString( stream.str() );
+			console->AddLine( QString::fromStdString( stream.str() ), type );
 	}
 }

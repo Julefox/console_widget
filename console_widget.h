@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QStandardItemModel>
+
 #include "console_widget_global.h"
 #include "utils/const.h"
 
@@ -32,8 +34,7 @@ class CONSOLE_WIDGET_EXPORT ConsoleWidget final : public QWidget
 	void SetupCommandFont( const QFont& font ) const { ui->commandLineEdit->setFont( font ); }
 	void SetupCompleterFont( const QFont& font ) const { completer->SetFont( font ); }
 
-	//template < typename T >
-	//void PrintConVarChanged( const ConVarBase* var, T newValue ) const;
+	void UpdateCommands() const;
 
 	static QList < ConsoleWidget* > GetConsoles() { return consoles; }
 
@@ -44,12 +45,20 @@ class CONSOLE_WIDGET_EXPORT ConsoleWidget final : public QWidget
 
 	static void SetupConsolesFonts( const QFont& font, const QFont& commandFont, const QFont& completerFont );
 
+	static void UpdateConsolesCommands();
+
 protected:
 	void keyPressEvent( QKeyEvent* event ) override;
+
+private slots:
+	void OnCommandEntered();
+	void SaveLogs();
+	void TabPressed() const;
 
 private:
 	Ui::ConsoleWidgetClass* ui;
 	ConsoleCompleter* completer = nullptr;
+	QStandardItemModel* completerModel;
 
 	QStringList commandBuffer;
 	int bufferIndex = -1;
@@ -57,10 +66,6 @@ private:
 	QList < LineData > lines;
 
 	void RemoveFirstLine() const;
-
-	void OnCommandEntered();
-	void SaveLogs();
-	void TabPressed() const;
 
 	inline static QMap < ePrintType, QColor > printColors = {
 		{ ePrintType::INFO, QColor( "#4A90E2" ) }, // Blue light

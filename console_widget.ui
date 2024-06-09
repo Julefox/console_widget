@@ -30,7 +30,14 @@
     <number>2</number>
    </property>
    <item row="0" column="0">
-    <widget class="QPlainTextEdit" name="consoleTextEdit"/>
+    <widget class="QPlainTextEdit" name="consoleTextEdit">
+     <property name="undoRedoEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item row="1" column="0">
     <widget class="QLineEdit" name="commandLineEdit"/>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QStringList>
+
 enum class ePrintType : int
 {
 	INFO,
@@ -8,3 +10,8 @@ enum class ePrintType : int
 	SUCCESS,
 	ERROR
 };
+
+class ConVarBase;
+class ConsoleWidget;
+
+using ConVarCallback = std::function < bool( ConVarBase*, const QStringList&, ConsoleWidget* ) >;
