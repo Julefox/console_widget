@@ -168,7 +168,7 @@ public:
 	[[nodiscard]] static QString GetConVarValueString( const QString& name );
 
 private:
-	inline static std::unordered_map < QString, ConVarBase* > conVars;
+	inline static std::map < QString, ConVarBase* > conVars;
 
 	static bool ClearConsoleCallback( ConVarBase*, const QStringList&, ConsoleWidget* );
 	static bool HelpCallback( ConVarBase*, const QStringList&, ConsoleWidget* );

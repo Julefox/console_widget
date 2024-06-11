@@ -280,7 +280,14 @@ void ConsoleWidget::RemoveFirstLine() const
 void ConsoleWidget::UpdateConsoleColors() const
 {
 	QStringList filters = ui->filterLineEdit->text().split( ',' );
-	filters.removeIf( [] ( const QString& filter ) { return filter.trimmed().size() < 2; } );
+
+	for ( auto it = filters.begin(); it != filters.end(); )
+	{
+		if ( it->trimmed().size() < 2 )
+			it = filters.erase( it );
+		else
+			++it;
+	}
 
 	const bool filterEnabled = FilterEnabled() && !filters.isEmpty();
 
