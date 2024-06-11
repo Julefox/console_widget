@@ -54,6 +54,7 @@ private slots:
 	void OnCommandEntered();
 	void SaveLogs();
 	void TabPressed() const;
+	void FilterChanged( const QString& filter ) const;
 
 private:
 	Ui::ConsoleWidgetClass* ui;
@@ -66,6 +67,9 @@ private:
 	QList < LineData > lines;
 
 	void RemoveFirstLine() const;
+	[[nodiscard]] bool FilterEnabled() const { return !ui->filterLineEdit->text().isEmpty(); }
+
+	void UpdateConsoleColors() const;
 
 	inline static QMap < ePrintType, QColor > printColors = {
 		{ ePrintType::INFO, QColor( "#4A90E2" ) }, // Blue light
@@ -76,6 +80,8 @@ private:
 	};
 
 	inline static QList < ConsoleWidget* > consoles;
+
+	inline static QColor disabledLineColor = { "#D3D3D3" }; // Light gray
 
 	static constexpr int MaxCommandBuffer = 16;
 	static constexpr int MaxLineCount = 1000;

@@ -24,6 +24,7 @@ public:
 	[[nodiscard]] QString GetName() const { return name; }
 	[[nodiscard]] QString GetDescription() const { return description; }
 	[[nodiscard]] bool IsVariable() const { return isVariable; }
+	[[nodiscard]] bool HasArguments() const { return !arguments.isEmpty(); }
 	[[nodiscard]] QStringList GetArguments() const { return arguments; }
 #if defined( QT_6 )
 	[[nodiscard]] int GetArgumentCount() const { return static_cast < int >( arguments.size() ); }

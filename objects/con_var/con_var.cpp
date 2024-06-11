@@ -19,7 +19,6 @@ eCVarType ConVar < T >::GetType( const ConVarBase* var )
 	return eCVarType::STRING;
 }
 
-
 void ConVarManager::ConVarInit()
 {
 	RegisterBoolConVar( "clear", false, "Clear the console", &ConVarManager::ClearConsoleCallback );
@@ -27,8 +26,8 @@ void ConVarManager::ConVarInit()
 
 	RegisterBoolConVar( "help", false, "Gives all available commands", &ConVarManager::HelpCallback );
 
-	RegisterBoolConVar( "say", false, "Print a message in this console", &ConVarManager::PrintCallback, QStringList( "message_string" ) );
-	RegisterAlias( "print", "say" );
+	RegisterBoolConVar( "print", false, "Print a message in this console", &ConVarManager::PrintCallback, QStringList( "message_string" ) );
+	RegisterAlias( "say", "print" );
 }
 
 void ConVarManager::RegisterConVar( ConVarBase* var )
@@ -130,7 +129,7 @@ bool ConVarManager::PrintInvalidArgument( ConsoleWidget* console, const ConVarBa
 	if ( !console )
 		return false;
 
-	QString message = QObject::tr( "Invalid argument for %1 usage:" ).arg( conVarName );
+	QString message = QString( "Invalid argument for %1 usage:" ).arg( conVarName );
 
 	for ( const QString& arg : var->GetArguments() )
 		message += " <" + arg + ">";

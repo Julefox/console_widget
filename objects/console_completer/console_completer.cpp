@@ -22,7 +22,7 @@ bool ConsoleCompleter::eventFilter( QObject* obj, QEvent* event )
 {
 	if ( event->type() == QEvent::KeyPress )
 	{
-		if ( const auto keyEvent = dynamic_cast < QKeyEvent* >( event ); keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Return )
+		if ( const auto keyEvent = dynamic_cast < QKeyEvent* >( event ); keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Space )
 		{
 			if ( popup()->isVisible() )
 			{
