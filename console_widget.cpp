@@ -50,19 +50,19 @@ void ConsoleWidget::AddLine( const QString& line, const ePrintType type )
 
 	switch ( type )
 	{
-	case ePrintType::INFO:
+	case ePrintType::PRINT_INFO:
 		str = QString( "%1 [INFO]     %2" ).arg( timestamp, line );
 		break;
-	case ePrintType::NOTICE:
+	case ePrintType::PRINT_NOTICE:
 		str = QString( "%1 [NOTICE]   %2" ).arg( timestamp, line );
 		break;
-	case ePrintType::WARNING:
+	case ePrintType::PRINT_WARNING:
 		str = QString( "%1 [WARNING]  %2" ).arg( timestamp, line );
 		break;
-	case ePrintType::ERROR:
+	case ePrintType::PRINT_ERROR:
 		str = QString( "%1 [ERROR]    %2" ).arg( timestamp, line );
 		break;
-	case ePrintType::SUCCESS:
+	case ePrintType::PRINT_SUCCESS:
 		str = QString( "%1 [SUCCESS]  %2" ).arg( timestamp, line );
 		break;
 	}
@@ -226,8 +226,8 @@ void ConsoleWidget::OnCommandEntered()
 	}
 	else
 	{
-		Print( ePrintType::ERROR ) << QString( "Unknown command: %1" ).arg( args[ 0 ] );
-		Print( ePrintType::INFO ) << QString( "Type 'help' for a list of available commands" );
+		Print( ePrintType::PRINT_ERROR ) << QString( "Unknown command: %1" ).arg( args[ 0 ] );
+		Print( ePrintType::PRINT_INFO ) << QString( "Type 'help' for a list of available commands" );
 	}
 
 	bufferIndex = -1;

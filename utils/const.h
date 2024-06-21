@@ -4,11 +4,11 @@
 
 enum class ePrintType : int
 {
-	INFO,
-	NOTICE,
-	WARNING,
-	SUCCESS,
-	ERROR
+	PRINT_INFO,
+	PRINT_NOTICE,
+	PRINT_WARNING,
+	PRINT_SUCCESS,
+	PRINT_ERROR
 };
 
 class ConVarBase;

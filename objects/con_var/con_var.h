@@ -70,21 +70,21 @@ public:
 		{
 			if ( HasMinValue() && newValue < GetMinValue() || HasMaxValue() && newValue > GetMaxValue() )
 			{
-				console->Print( ePrintType::ERROR ) << U8( "ConVar::SetValue() Error: Value is out of range, expected between %1 - %2" ).arg( QString::number( GetMinValue() ) ).arg( QString::number( GetMaxValue() ) );
+				console->Print( ePrintType::PRINT_ERROR ) << U8( "ConVar::SetValue() Error: Value is out of range, expected between %1 - %2" ).arg( QString::number( GetMinValue() ) ).arg( QString::number( GetMaxValue() ) );
 				return;
 			}
 
 			if ( this->IsVariable() && console )
 			{
 				const auto message = ConVarChangeMessage.arg( this->GetName() );
-				if ( std::is_same_v < T, QString > ) { console->Print( ePrintType::NOTICE ) << QString( message ).arg( this->GetValue() ).arg( newValue ); }
-				else if ( std::is_same_v < T, int > || std::is_same_v < T, float > ) { console->Print( ePrintType::NOTICE ) << QString( message ).arg( QString::number( this->GetValue() ) ).arg( QString::number( newValue ) ); }
+				if ( std::is_same_v < T, QString > ) { console->Print( ePrintType::PRINT_NOTICE ) << QString( message ).arg( this->GetValue() ).arg( newValue ); }
+				else if ( std::is_same_v < T, int > || std::is_same_v < T, float > ) { console->Print( ePrintType::PRINT_NOTICE ) << QString( message ).arg( QString::number( this->GetValue() ) ).arg( QString::number( newValue ) ); }
 				else if ( std::is_same_v < T, bool > )
 				{
 					const QString boolValue = this->GetValue() == true ? "true" : "false";
 					const QString newBoolValue = newValue == true ? "true" : "false";
 
-					console->Print( ePrintType::NOTICE ) << QString( message ).arg( boolValue ).arg( newBoolValue );
+					console->Print( ePrintType::PRINT_NOTICE ) << QString( message ).arg( boolValue ).arg( newBoolValue );
 				}
 			}
 		}

@@ -35,7 +35,7 @@ void ConVarManager::RegisterConVar( ConVarBase* var )
 	const QString name = var->GetName();
 	if ( GetConVars().contains( name ) )
 	{
-		ConsoleWidget::PrintGlobal( ePrintType::ERROR ) << "ConVarManager::RegisterConVar() ConVar" << name << "already exists!";
+		ConsoleWidget::PrintGlobal( ePrintType::PRINT_ERROR ) << "ConVarManager::RegisterConVar() ConVar" << name << "already exists!";
 		return;
 	}
 
@@ -47,7 +47,7 @@ void ConVarManager::RegisterAlias( const QString& alias, const QString& original
 	if ( auto* conVar = GetConVar( originalName ); conVar && !conVars.contains( alias ) )
 		conVars.insert( { alias, conVar } );
 
-	ConsoleWidget::PrintGlobal( ePrintType::ERROR ) << "ConVarManager::RegisterAlias() Alias" << alias << "for" << originalName << "already exists!";
+	ConsoleWidget::PrintGlobal( ePrintType::PRINT_ERROR ) << "ConVarManager::RegisterAlias() Alias" << alias << "for" << originalName << "already exists!";
 }
 
 ConVar < float >* ConVarManager::RegisterFloatConVar( const QString& name, const float defaultValue, const QString& description, const ConVarCallback& callback, const QStringList& args, const bool isVariable )

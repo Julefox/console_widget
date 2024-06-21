@@ -11,8 +11,8 @@ class ConsoleWidget;
 class ConsolePrinter
 {
 public:
-	explicit ConsolePrinter( const ePrintType printType = ePrintType::INFO ) : type( printType ) {}
-	explicit ConsolePrinter( ConsoleWidget* consolePtr, const ePrintType printType = ePrintType::INFO ) : type( printType ), console( consolePtr ) {}
+	explicit ConsolePrinter( const ePrintType printType = ePrintType::PRINT_INFO ) : type( printType ) {}
+	explicit ConsolePrinter( ConsoleWidget* consolePtr, const ePrintType printType = ePrintType::PRINT_INFO ) : type( printType ), console( consolePtr ) {}
 	virtual ~ConsolePrinter();
 
 	template < typename T >
@@ -40,6 +40,6 @@ protected:
 class GlobalConsolePrinter final : public ConsolePrinter
 {
 public:
-	explicit GlobalConsolePrinter( const ePrintType printType = ePrintType::INFO ) : ConsolePrinter( printType ) {}
+	explicit GlobalConsolePrinter( const ePrintType printType = ePrintType::PRINT_INFO ) : ConsolePrinter( printType ) {}
 	~GlobalConsolePrinter() override;
 };

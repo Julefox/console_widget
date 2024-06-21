@@ -24,9 +24,9 @@ class CONSOLE_WIDGET_EXPORT ConsoleWidget final : public QWidget
 	Q_OBJECT public:
 	explicit ConsoleWidget( QWidget* parent = nullptr );
 
-	ConsolePrinter Print( const ePrintType type = ePrintType::INFO ) { return ConsolePrinter( this, type ); }
+	ConsolePrinter Print( const ePrintType type = ePrintType::PRINT_INFO ) { return ConsolePrinter( this, type ); }
 
-	void AddLine( const QString& line, ePrintType type = ePrintType::INFO );
+	void AddLine( const QString& line, ePrintType type = ePrintType::PRINT_INFO );
 	void Clear();
 
 	void SetupFonts( const QFont& consoleFont, const QFont& commandFont, const QFont& completerFont ) const;
@@ -38,7 +38,7 @@ class CONSOLE_WIDGET_EXPORT ConsoleWidget final : public QWidget
 
 	static QList < ConsoleWidget* > GetConsoles() { return consoles; }
 
-	static GlobalConsolePrinter PrintGlobal( const ePrintType type = ePrintType::INFO ) { return GlobalConsolePrinter( type ); }
+	static GlobalConsolePrinter PrintGlobal( const ePrintType type = ePrintType::PRINT_INFO ) { return GlobalConsolePrinter( type ); }
 
 	static void SetPrintColor( const ePrintType type, const QColor& color ) { printColors[ type ] = color; }
 	static QColor GetPrintColor( const ePrintType type ) { return printColors[ type ]; }
@@ -72,11 +72,11 @@ private:
 	void UpdateConsoleColors() const;
 
 	inline static QMap < ePrintType, QColor > printColors = {
-		{ ePrintType::INFO, QColor( "#4A90E2" ) }, // Blue light
-		{ ePrintType::NOTICE, QColor( "#87CEEB" ) }, // Blue sky
-		{ ePrintType::WARNING, QColor( "#F5A623" ) }, // Orange light
-		{ ePrintType::ERROR, QColor( "#D0021B" ) }, // Red light
-		{ ePrintType::SUCCESS, QColor( "#7ED321" ) } // Green light
+		{ ePrintType::PRINT_INFO, QColor( "#4A90E2" ) }, // Blue light
+		{ ePrintType::PRINT_NOTICE, QColor( "#87CEEB" ) }, // Blue sky
+		{ ePrintType::PRINT_WARNING, QColor( "#F5A623" ) }, // Orange light
+		{ ePrintType::PRINT_ERROR, QColor( "#D0021B" ) }, // Red light
+		{ ePrintType::PRINT_SUCCESS, QColor( "#7ED321" ) } // Green light
 	};
 
 	inline static QList < ConsoleWidget* > consoles;
